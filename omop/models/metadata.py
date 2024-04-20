@@ -1,6 +1,19 @@
 from django.db import models
 
 class Metadata(models.Model):
+    """
+    CREATE TABLE @cdmDatabaseSchema.METADATA (
+			metadata_id integer NOT NULL,
+			metadata_concept_id integer NOT NULL,
+			metadata_type_concept_id integer NOT NULL,
+			name varchar(250) NOT NULL,
+			value_as_string varchar(250) NULL,
+			value_as_concept_id integer NULL,
+			value_as_number NUMERIC NULL,
+			metadata_date date NULL,
+			metadata_datetime TIMESTAMP NULL );
+    ALTER TABLE @cdmDatabaseSchema.METADATA ADD CONSTRAINT xpk_METADATA PRIMARY KEY (metadata_id);
+    """
     metadata_id = models.IntegerField(primary_key=True)
     metadata_concept_id = models.IntegerField()
     metadata_type_concept_id = models.IntegerField()
@@ -13,6 +26,20 @@ class Metadata(models.Model):
 
 
 class CdmSource(models.Model):
+    """
+    CREATE TABLE @cdmDatabaseSchema.CDM_SOURCE (
+			cdm_source_name varchar(255) NOT NULL,
+			cdm_source_abbreviation varchar(25) NOT NULL,
+			cdm_holder varchar(255) NOT NULL,
+			source_description TEXT NULL,
+			source_documentation_reference varchar(255) NULL,
+			cdm_etl_reference varchar(255) NULL,
+			source_release_date date NOT NULL,
+			cdm_release_date date NOT NULL,
+			cdm_version varchar(10) NULL,
+			cdm_version_concept_id integer NOT NULL,
+			vocabulary_version varchar(20) NOT NULL );
+    """
     cdm_source_name = models.CharField(max_length=255)
     cdm_source_abbreviation = models.CharField(max_length=25)
     cdm_holder = models.CharField(max_length=255)

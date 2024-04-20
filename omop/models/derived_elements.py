@@ -10,6 +10,7 @@ class ConditionEra(models.Model):
 			condition_era_start_date date NOT NULL,
 			condition_era_end_date date NOT NULL,
 			condition_occurrence_count integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.CONDITION_ERA ADD CONSTRAINT xpk_CONDITION_ERA PRIMARY KEY (condition_era_id);
     """
     condition_era_id = models.IntegerField(primary_key=True)
     person_id = models.IntegerField()
@@ -29,6 +30,7 @@ class DrugEra(models.Model):
 			drug_era_end_date date NOT NULL,
 			drug_exposure_count integer NULL,
 			gap_days integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.DRUG_ERA ADD CONSTRAINT xpk_DRUG_ERA PRIMARY KEY (drug_era_id);
     """
     drug_era_id = models.IntegerField(primary_key=True)
     person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -48,6 +50,7 @@ class DoseEra(models.Model):
 			dose_value NUMERIC NOT NULL,
 			dose_era_start_date date NOT NULL,
 			dose_era_end_date date NOT NULL );
+    ALTER TABLE @cdmDatabaseSchema.DOSE_ERA ADD CONSTRAINT xpk_DOSE_ERA PRIMARY KEY (dose_era_id);
     """
     dose_era_id = models.IntegerField(primary_key=True)
     person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -66,7 +69,7 @@ class Cohort(models.Model):
 			cohort_start_date date NOT NULL,
 			cohort_end_date date NOT NULL );
     """
-    cohort_definition_id = models.IntegerField(primary_key=True)
+    cohort_definition_id = models.IntegerField()
     subject_id = models.IntegerField()
     cohort_start_date = models.DateField()
     cohort_end_date = models.DateField()
@@ -83,7 +86,7 @@ class CohortDefinition(models.Model):
 			subject_concept_id integer NOT NULL,
 			cohort_initiation_date date NULL );
     """
-    cohort_definition_id = models.IntegerField(primary_key=True)
+    cohort_definition_id = models.IntegerField()
     cohort_definition_name = models.CharField(max_length=255)
     cohort_definition_description = models.TextField(null=True, blank=True)
     definition_type_concept_id = models.IntegerField()

@@ -14,6 +14,7 @@ class Concept(models.Model):
         valid_start_date date NOT NULL,
         valid_end_date date NOT NULL,
         invalid_reason varchar(1) NULL );
+    ALTER TABLE @cdmDatabaseSchema.CONCEPT ADD CONSTRAINT xpk_CONCEPT PRIMARY KEY (concept_id);
     """
     concept_id = models.IntegerField(primary_key=True)
     concept_name = models.CharField(max_length=255)
@@ -35,6 +36,7 @@ class Vocabulary(models.Model):
 			vocabulary_reference varchar(255) NULL,
 			vocabulary_version varchar(255) NULL,
 			vocabulary_concept_id integer NOT NULL );
+    ALTER TABLE @cdmDatabaseSchema.VOCABULARY ADD CONSTRAINT xpk_VOCABULARY PRIMARY KEY (vocabulary_id);
     """
     vocabulary_id = models.CharField(max_length=20, primary_key=True)
     vocabulary_name = models.CharField(max_length=255)
@@ -49,6 +51,7 @@ class Domain(models.Model):
 			domain_id varchar(20) NOT NULL,
 			domain_name varchar(255) NOT NULL,
 			domain_concept_id integer NOT NULL );
+    ALTER TABLE @cdmDatabaseSchema.DOMAIN ADD CONSTRAINT xpk_DOMAIN PRIMARY KEY (domain_id);
     """
     domain_id = models.CharField(max_length=20, primary_key=True)
     domain_name = models.CharField(max_length=255)
@@ -60,6 +63,7 @@ class ConceptClass(models.Model):
 			concept_class_id varchar(20) NOT NULL,
 			concept_class_name varchar(255) NOT NULL,
 			concept_class_concept_id integer NOT NULL );
+    ALTER TABLE @cdmDatabaseSchema.CONCEPT_CLASS ADD CONSTRAINT xpk_CONCEPT_CLASS PRIMARY KEY (concept_class_id);
     """
     concept_class_id = models.CharField(max_length=20, primary_key=True)
     concept_class_name = models.CharField(max_length=255)
@@ -92,6 +96,7 @@ class Relationship(models.Model):
 			defines_ancestry varchar(1) NOT NULL,
 			reverse_relationship_id varchar(20) NOT NULL,
 			relationship_concept_id integer NOT NULL );
+    ALTER TABLE @cdmDatabaseSchema.RELATIONSHIP ADD CONSTRAINT xpk_RELATIONSHIP PRIMARY KEY (relationship_id);
     """
     relationship_id = models.CharField(max_length=20, primary_key=True)
     relationship_name = models.CharField(max_length=255)

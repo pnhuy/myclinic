@@ -25,6 +25,7 @@ class Cost(models.Model):
 			revenue_code_source_value varchar(50) NULL,
 			drg_concept_id integer NULL,
 			drg_source_value varchar(3) NULL );
+    ALTER TABLE @cdmDatabaseSchema.COST ADD CONSTRAINT xpk_COST PRIMARY KEY (cost_id);
     """
     cost_id = models.IntegerField(primary_key=True)
     cost_event_id = models.IntegerField()
@@ -69,6 +70,7 @@ class PayerPlanPeriod(models.Model):
 			stop_reason_concept_id integer NULL,
 			stop_reason_source_value varchar(50) NULL,
 			stop_reason_source_concept_id integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.PAYER_PLAN_PERIOD ADD CONSTRAINT xpk_PAYER_PLAN_PERIOD PRIMARY KEY (payer_plan_period_id);
     """
     payer_plan_period_id = models.IntegerField(primary_key=True)
     person_id = models.IntegerField()

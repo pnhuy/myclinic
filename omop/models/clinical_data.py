@@ -1,4 +1,7 @@
 from django.db import models
+from omop.models import DEFAULT_ON_DELETE
+from omop.models.health_system import CareSite, Location, Provider
+from omop.models.vocabularies import Concept
 
 class Person(models.Model):
     """
@@ -21,25 +24,43 @@ class Person(models.Model):
 			race_source_concept_id integer NULL,
 			ethnicity_source_value varchar(50) NULL,
 			ethnicity_source_concept_id integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT xpk_PERSON PRIMARY KEY (person_id);
     """
     person_id = models.IntegerField(primary_key=True)
-    gender_concept_id = models.IntegerField()
+    # ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT fpk_PERSON_gender_concept_id FOREIGN KEY (gender_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    gender_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    
     year_of_birth = models.IntegerField()
     month_of_birth = models.IntegerField(null=True, blank=True)
     day_of_birth = models.IntegerField(null=True, blank=True)
     birth_datetime = models.DateTimeField(null=True, blank=True)
-    race_concept_id = models.IntegerField()
-    ethnicity_concept_id = models.IntegerField()
-    location_id = models.IntegerField(null=True, blank=True)
-    provider_id = models.IntegerField(null=True, blank=True)
-    care_site_id = models.IntegerField(null=True, blank=True)
+
+    # ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT fpk_PERSON_race_concept_id FOREIGN KEY (race_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    race_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+
+    # ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT fpk_PERSON_ethnicity_concept_id FOREIGN KEY (ethnicity_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    ethnicity_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+
+    # ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT fpk_PERSON_location_id FOREIGN KEY (location_id) REFERENCES @cdmDatabaseSchema.LOCATION (LOCATION_ID);
+    location_id = models.ForeignKey(Location, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+
+    # ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT fpk_PERSON_provider_id FOREIGN KEY (provider_id) REFERENCES @cdmDatabaseSchema.PROVIDER (PROVIDER_ID);
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+
+    # ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT fpk_PERSON_care_site_id FOREIGN KEY (care_site_id) REFERENCES @cdmDatabaseSchema.CARE_SITE (CARE_SITE_ID);
+    care_site_id = models.ForeignKey(CareSite, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     person_source_value = models.CharField(max_length=50, null=True, blank=True)
     gender_source_value = models.CharField(max_length=50, null=True, blank=True)
-    gender_source_concept_id = models.IntegerField(null=True, blank=True)
+    # ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT fpk_PERSON_gender_source_concept_id FOREIGN KEY (gender_source_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    gender_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     race_source_value = models.CharField(max_length=50, null=True, blank=True)
-    race_source_concept_id = models.IntegerField(null=True, blank=True)
+
+    # ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT fpk_PERSON_race_source_concept_id FOREIGN KEY (race_source_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    race_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     ethnicity_source_value = models.CharField(max_length=50, null=True, blank=True)
-    ethnicity_source_concept_id = models.IntegerField(null=True, blank=True)
+
+    # ALTER TABLE @cdmDatabaseSchema.PERSON ADD CONSTRAINT fpk_PERSON_ethnicity_source_concept_id FOREIGN KEY (ethnicity_source_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    ethnicity_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
 
 
 class ObservationPeriod(models.Model):
@@ -49,12 +70,16 @@ class ObservationPeriod(models.Model):
 			observation_period_start_date date NOT NULL,
 			observation_period_end_date date NOT NULL,
 			period_type_concept_id integer NOT NULL );
+    ALTER TABLE @cdmDatabaseSchema.OBSERVATION_PERIOD ADD CONSTRAINT xpk_OBSERVATION_PERIOD PRIMARY KEY (observation_period_id);
     """
     observation_period_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
+     # ALTER TABLE @cdmDatabaseSchema.OBSERVATION_PERIOD ADD CONSTRAINT fpk_OBSERVATION_PERIOD_person_id FOREIGN KEY (person_id) REFERENCES @cdmDatabaseSchema.PERSON (PERSON_ID);
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
     observation_period_start_date = models.DateField()
     observation_period_end_date = models.DateField()
-    period_type_concept_id = models.IntegerField()
+
+    # ALTER TABLE @cdmDatabaseSchema.OBSERVATION_PERIOD ADD CONSTRAINT fpk_OBSERVATION_PERIOD_period_type_concept_id FOREIGN KEY (period_type_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    period_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
 
 
 
@@ -69,13 +94,17 @@ class Death(models.Model):
 			cause_source_value varchar(50) NULL,
 			cause_source_concept_id integer NULL );
     """
-    person_id = models.ForeignKey(Person, primary_key=True, on_delete=models.CASCADE)
+    # ALTER TABLE @cdmDatabaseSchema.DEATH ADD CONSTRAINT fpk_DEATH_person_id FOREIGN KEY (person_id) REFERENCES @cdmDatabaseSchema.PERSON (PERSON_ID);
+    person_id = models.ForeignKey(Person, primary_key=True, on_delete=DEFAULT_ON_DELETE)
     death_date = models.DateField()
     death_datetime = models.DateTimeField(null=True, blank=True)
-    death_type_concept_id = models.IntegerField(null=True, blank=True)
-    cause_concept_id = models.IntegerField(null=True, blank=True)
+    # ALTER TABLE @cdmDatabaseSchema.DEATH ADD CONSTRAINT fpk_DEATH_death_type_concept_id FOREIGN KEY (death_type_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    death_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    # ALTER TABLE @cdmDatabaseSchema.DEATH ADD CONSTRAINT fpk_DEATH_cause_concept_id FOREIGN KEY (cause_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    cause_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     cause_source_value = models.CharField(max_length=50, null=True, blank=True)
-    cause_source_concept_id = models.IntegerField(null=True, blank=True)
+    # ALTER TABLE @cdmDatabaseSchema.DEATH ADD CONSTRAINT fpk_DEATH_cause_source_concept_id FOREIGN KEY (cause_source_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    cause_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
 
 
 
@@ -99,24 +128,42 @@ class VisitOccurrence(models.Model):
 			discharged_to_concept_id integer NULL,
 			discharged_to_source_value varchar(50) NULL,
 			preceding_visit_occurrence_id integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT xpk_VISIT_OCCURRENCE PRIMARY KEY (visit_occurrence_id);
     """
     visit_occurrence_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    visit_concept_id = models.IntegerField()
+
+    # ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT fpk_VISIT_OCCURRENCE_person_id FOREIGN KEY (person_id) REFERENCES @cdmDatabaseSchema.PERSON (PERSON_ID);
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+
+    # ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT fpk_VISIT_OCCURRENCE_visit_concept_id FOREIGN KEY (visit_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    visit_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     visit_start_date = models.DateField()
     visit_start_datetime = models.DateTimeField(null=True, blank=True)
     visit_end_date = models.DateField()
     visit_end_datetime = models.DateTimeField(null=True, blank=True)
-    visit_type_concept_id = models.IntegerField()
-    provider_id = models.IntegerField(null=True, blank=True)
-    care_site_id = models.IntegerField(null=True, blank=True)
+    # ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT fpk_VISIT_OCCURRENCE_visit_type_concept_id FOREIGN KEY (visit_type_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    visit_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+
+    # ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT fpk_VISIT_OCCURRENCE_provider_id FOREIGN KEY (provider_id) REFERENCES @cdmDatabaseSchema.PROVIDER (PROVIDER_ID);
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+
+    # ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT fpk_VISIT_OCCURRENCE_care_site_id FOREIGN KEY (care_site_id) REFERENCES @cdmDatabaseSchema.CARE_SITE (CARE_SITE_ID);
+    care_site_id = models.ForeignKey(CareSite, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    
     visit_source_value = models.CharField(max_length=50, null=True, blank=True)
-    visit_source_concept_id = models.IntegerField(null=True, blank=True)
-    admitted_from_concept_id = models.IntegerField(null=True, blank=True)
-    admitted_from_source_value = models.CharField(max_length=50, null=True, blank=True)
-    discharged_to_concept_id = models.IntegerField(null=True, blank=True)
+    # ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT fpk_VISIT_OCCURRENCE_visit_source_concept_id FOREIGN KEY (visit_source_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    visit_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+
+    # ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT fpk_VISIT_OCCURRENCE_admitted_from_concept_id FOREIGN KEY (admitted_from_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    admitted_from_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    admitted_from_source_value = models.CharField(max_length=50, null=True, blank=True, null=True, blank=True)
+
+    # ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT fpk_VISIT_OCCURRENCE_discharged_to_concept_id FOREIGN KEY (discharged_to_concept_id) REFERENCES @cdmDatabaseSchema.CONCEPT (CONCEPT_ID);
+    discharged_to_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     discharged_to_source_value = models.CharField(max_length=50, null=True, blank=True)
-    preceding_visit_occurrence_id = models.IntegerField(null=True, blank=True)
+
+    # ALTER TABLE @cdmDatabaseSchema.VISIT_OCCURRENCE ADD CONSTRAINT fpk_VISIT_OCCURRENCE_preceding_visit_occurrence_id FOREIGN KEY (preceding_visit_occurrence_id) REFERENCES @cdmDatabaseSchema.VISIT_OCCURRENCE (VISIT_OCCURRENCE_ID);
+    preceding_visit_occurrence_id = models.ForeignKey('self', on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
 
 
 
@@ -142,26 +189,27 @@ class VisitDetail(models.Model):
 			preceding_visit_detail_id integer NULL,
 			parent_visit_detail_id integer NULL,
 			visit_occurrence_id integer NOT NULL );
+    ALTER TABLE @cdmDatabaseSchema.VISIT_DETAIL ADD CONSTRAINT xpk_VISIT_DETAIL PRIMARY KEY (visit_detail_id);
     """
     visit_detail_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    visit_detail_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    visit_detail_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     visit_detail_start_date = models.DateField()
     visit_detail_start_datetime = models.DateTimeField(null=True, blank=True)
     visit_detail_end_date = models.DateField()
     visit_detail_end_datetime = models.DateTimeField(null=True, blank=True)
-    visit_detail_type_concept_id = models.IntegerField()
-    provider_id = models.IntegerField(null=True, blank=True)
-    care_site_id = models.IntegerField(null=True, blank=True)
+    visit_detail_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    care_site_id = models.ForeignKey(CareSite, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     visit_detail_source_value = models.CharField(max_length=50, null=True, blank=True)
-    visit_detail_source_concept_id = models.IntegerField(null=True, blank=True)
-    admitted_from_concept_id = models.IntegerField(null=True, blank=True)
+    visit_detail_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    admitted_from_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     admitted_from_source_value = models.CharField(max_length=50, null=True, blank=True)
     discharged_to_source_value = models.CharField(max_length=50, null=True, blank=True)
-    discharged_to_concept_id = models.IntegerField(null=True, blank=True)
-    preceding_visit_detail_id = models.IntegerField(null=True, blank=True)
-    parent_visit_detail_id = models.IntegerField(null=True, blank=True)
-    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=models.CASCADE)
+    discharged_to_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    preceding_visit_detail_id = models.ForeignKey('self', on_delete=DEFAULT_ON_DELETE, related_name="following_visit_detail", null=True, blank=True)
+    parent_visit_detail_id = models.ForeignKey('self', on_delete=DEFAULT_ON_DELETE, related_name="child_visit_detail", null=True, blank=True)
+    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=DEFAULT_ON_DELETE)
 
 
 class ConditionOccurrence(models.Model):
@@ -183,22 +231,23 @@ class ConditionOccurrence(models.Model):
 			condition_source_value varchar(50) NULL,
 			condition_source_concept_id integer NULL,
 			condition_status_source_value varchar(50) NULL );
+    ALTER TABLE @cdmDatabaseSchema.CONDITION_OCCURRENCE ADD CONSTRAINT xpk_CONDITION_OCCURRENCE PRIMARY KEY (condition_occurrence_id);
     """
     condition_occurrence_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    condition_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    condition_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     condition_start_date = models.DateField()
     condition_start_datetime = models.DateTimeField(null=True, blank=True)
     condition_end_date = models.DateField(null=True, blank=True)
     condition_end_datetime = models.DateTimeField(null=True, blank=True)
-    condition_type_concept_id = models.IntegerField()
-    condition_status_concept_id = models.IntegerField(null=True, blank=True)
+    condition_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    condition_status_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     stop_reason = models.CharField(max_length=20, null=True, blank=True)
-    provider_id = models.IntegerField(null=True, blank=True)
-    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=models.CASCADE, null=True, blank=True)
-    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=models.CASCADE, null=True, blank=True)
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     condition_source_value = models.CharField(max_length=50, null=True, blank=True)
-    condition_source_concept_id = models.IntegerField(null=True, blank=True)
+    condition_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     condition_status_source_value = models.CharField(max_length=50, null=True, blank=True)
 
 
@@ -228,28 +277,29 @@ class DrugExposure(models.Model):
 			drug_source_concept_id integer NULL,
 			route_source_value varchar(50) NULL,
 			dose_unit_source_value varchar(50) NULL );
+    ALTER TABLE @cdmDatabaseSchema.DRUG_EXPOSURE ADD CONSTRAINT xpk_DRUG_EXPOSURE PRIMARY KEY (drug_exposure_id);
     """
     drug_exposure_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    drug_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    drug_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     drug_exposure_start_date = models.DateField()
     drug_exposure_start_datetime = models.DateTimeField(null=True, blank=True)
     drug_exposure_end_date = models.DateField()
     drug_exposure_end_datetime = models.DateTimeField(null=True, blank=True)
     verbatim_end_date = models.DateField(null=True, blank=True)
-    drug_type_concept_id = models.IntegerField()
+    drug_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     stop_reason = models.CharField(max_length=20, null=True, blank=True)
     refills = models.IntegerField(null=True, blank=True)
     quantity = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     days_supply = models.IntegerField(null=True, blank=True)
     sig = models.TextField(null=True, blank=True)
-    route_concept_id = models.IntegerField(null=True, blank=True)
+    route_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     lot_number = models.CharField(max_length=50, null=True, blank=True)
-    provider_id = models.IntegerField(null=True, blank=True)
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=models.CASCADE, null=True, blank=True)
     visit_detail_id = models.ForeignKey(VisitDetail, on_delete=models.CASCADE, null=True, blank=True)
     drug_source_value = models.CharField(max_length=50, null=True, blank=True)
-    drug_source_concept_id = models.IntegerField(null=True, blank=True)
+    drug_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     route_source_value = models.CharField(max_length=50, null=True, blank=True)
     dose_unit_source_value = models.CharField(max_length=50, null=True, blank=True)
 
@@ -273,22 +323,23 @@ class ProcedureOccurrence(models.Model):
 			procedure_source_value varchar(50) NULL,
 			procedure_source_concept_id integer NULL,
 			modifier_source_value varchar(50) NULL );
+    ALTER TABLE @cdmDatabaseSchema.PROCEDURE_OCCURRENCE ADD CONSTRAINT xpk_PROCEDURE_OCCURRENCE PRIMARY KEY (procedure_occurrence_id);
     """
     procedure_occurrence_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    procedure_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    procedure_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     procedure_date = models.DateField()
     procedure_datetime = models.DateTimeField(null=True, blank=True)
     procedure_end_date = models.DateField(null=True, blank=True)
     procedure_end_datetime = models.DateTimeField(null=True, blank=True)
-    procedure_type_concept_id = models.IntegerField()
-    modifier_concept_id = models.IntegerField(null=True, blank=True)
+    procedure_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    modifier_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     quantity = models.IntegerField(null=True, blank=True)
-    provider_id = models.IntegerField(null=True, blank=True)
-    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=models.CASCADE, null=True, blank=True)
-    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=models.CASCADE, null=True, blank=True)
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=models.CASCADE, null=True, blank=True, null=True, blank=True)
+    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=models.CASCADE, null=True, blank=True, null=True, blank=True)
     procedure_source_value = models.CharField(max_length=50, null=True, blank=True)
-    procedure_source_concept_id = models.IntegerField(null=True, blank=True)
+    procedure_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     modifier_source_value = models.CharField(max_length=50, null=True, blank=True)
 
 class DeviceExposure(models.Model):
@@ -313,26 +364,27 @@ class DeviceExposure(models.Model):
 			unit_concept_id integer NULL,
 			unit_source_value varchar(50) NULL,
 			unit_source_concept_id integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.DEVICE_EXPOSURE ADD CONSTRAINT xpk_DEVICE_EXPOSURE PRIMARY KEY (device_exposure_id);
     """
     device_exposure_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    device_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    device_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     device_exposure_start_date = models.DateField()
     device_exposure_start_datetime = models.DateTimeField(null=True, blank=True)
     device_exposure_end_date = models.DateField(null=True, blank=True)
     device_exposure_end_datetime = models.DateTimeField(null=True, blank=True)
-    device_type_concept_id = models.IntegerField()
+    device_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     unique_device_id = models.CharField(max_length=255, null=True, blank=True)
     production_id = models.CharField(max_length=255, null=True, blank=True)
     quantity = models.IntegerField(null=True, blank=True)
-    provider_id = models.IntegerField(null=True, blank=True)
-    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=models.CASCADE, null=True, blank=True)
-    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=models.CASCADE, null=True, blank=True)
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     device_source_value = models.CharField(max_length=50, null=True, blank=True)
-    device_source_concept_id = models.IntegerField(null=True, blank=True)
-    unit_concept_id = models.IntegerField(null=True, blank=True)
+    device_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    unit_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     unit_source_value = models.CharField(max_length=50, null=True, blank=True)
-    unit_source_concept_id = models.IntegerField(null=True, blank=True)
+    unit_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
 
 class Measurement(models.Model):
     """
@@ -360,30 +412,31 @@ class Measurement(models.Model):
 			value_source_value varchar(50) NULL,
 			measurement_event_id integer NULL,
 			meas_event_field_concept_id integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.MEASUREMENT ADD CONSTRAINT xpk_MEASUREMENT PRIMARY KEY (measurement_id);
     """
     measurement_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    measurement_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    measurement_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     measurement_date = models.DateField()
     measurement_datetime = models.DateTimeField(null=True, blank=True)
     measurement_time = models.CharField(max_length=10, null=True, blank=True)
-    measurement_type_concept_id = models.IntegerField()
-    operator_concept_id = models.IntegerField(null=True, blank=True)
+    measurement_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    operator_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     value_as_number = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    value_as_concept_id = models.IntegerField(null=True, blank=True)
-    unit_concept_id = models.IntegerField(null=True, blank=True)
+    value_as_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    unit_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     range_low = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     range_high = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    provider_id = models.IntegerField(null=True, blank=True)
-    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=models.CASCADE, null=True, blank=True)
-    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=models.CASCADE, null=True, blank=True)
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     measurement_source_value = models.CharField(max_length=50, null=True, blank=True)
-    measurement_source_concept_id = models.IntegerField(null=True, blank=True)
+    measurement_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     unit_source_value = models.CharField(max_length=50, null=True, blank=True)
-    unit_source_concept_id = models.IntegerField(null=True, blank=True)
+    unit_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     value_source_value = models.CharField(max_length=50, null=True, blank=True)
     measurement_event_id = models.IntegerField(null=True, blank=True)
-    meas_event_field_concept_id = models.IntegerField(null=True, blank=True)
+    meas_event_field_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
 
 
 class Observation(models.Model):
@@ -410,28 +463,29 @@ class Observation(models.Model):
 			value_source_value varchar(50) NULL,
 			observation_event_id integer NULL,
 			obs_event_field_concept_id integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.OBSERVATION ADD CONSTRAINT xpk_OBSERVATION PRIMARY KEY (observation_id);
     """
     observation_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    observation_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    observation_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     observation_date = models.DateField()
     observation_datetime = models.DateTimeField(null=True, blank=True)
-    observation_type_concept_id = models.IntegerField()
+    observation_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     value_as_number = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     value_as_string = models.CharField(max_length=60, null=True, blank=True)
-    value_as_concept_id = models.IntegerField(null=True, blank=True)
-    qualifier_concept_id = models.IntegerField(null=True, blank=True)
-    unit_concept_id = models.IntegerField(null=True, blank=True)
-    provider_id = models.IntegerField(null=True, blank=True)
-    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=models.CASCADE, null=True, blank=True)
-    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=models.CASCADE, null=True, blank=True)
+    value_as_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    qualifier_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    unit_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     observation_source_value = models.CharField(max_length=50, null=True, blank=True)
-    observation_source_concept_id = models.IntegerField(null=True, blank=True)
+    observation_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE,null=True, blank=True)
     unit_source_value = models.CharField(max_length=50, null=True, blank=True)
     qualifier_source_value = models.CharField(max_length=50, null=True, blank=True)
     value_source_value = models.CharField(max_length=50, null=True, blank=True)
     observation_event_id = models.IntegerField(null=True, blank=True)
-    obs_event_field_concept_id = models.IntegerField(null=True, blank=True)
+    obs_event_field_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
 
 class Note(models.Model):
     """
@@ -452,23 +506,24 @@ class Note(models.Model):
 			note_source_value varchar(50) NULL,
 			note_event_id integer NULL,
 			note_event_field_concept_id integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.NOTE ADD CONSTRAINT xpk_NOTE PRIMARY KEY (note_id);
     """
     note_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
     note_date = models.DateField()
     note_datetime = models.DateTimeField(null=True, blank=True)
-    note_type_concept_id = models.IntegerField()
-    note_class_concept_id = models.IntegerField()
+    note_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    note_class_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     note_title = models.CharField(max_length=250, null=True, blank=True)
     note_text = models.TextField()
-    encoding_concept_id = models.IntegerField()
-    language_concept_id = models.IntegerField()
-    provider_id = models.IntegerField(null=True, blank=True)
-    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=models.CASCADE, null=True, blank=True)
-    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=models.CASCADE, null=True, blank=True)
+    encoding_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    language_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    provider_id = models.ForeignKey(Provider, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_occurrence_id = models.ForeignKey(VisitOccurrence, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    visit_detail_id = models.ForeignKey(VisitDetail, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     note_source_value = models.CharField(max_length=50, null=True, blank=True)
     note_event_id = models.IntegerField(null=True, blank=True)
-    note_event_field_concept_id = models.IntegerField(null=True, blank=True)
+    note_event_field_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
 
 
 class NoteNLP(models.Model):
@@ -488,15 +543,16 @@ class NoteNLP(models.Model):
 			term_exists varchar(1) NULL,
 			term_temporal varchar(50) NULL,
 			term_modifiers varchar(2000) NULL );
+    ALTER TABLE @cdmDatabaseSchema.NOTE_NLP ADD CONSTRAINT xpk_NOTE_NLP PRIMARY KEY (note_nlp_id);
     """
     note_nlp_id = models.IntegerField(primary_key=True)
-    note_id = models.ForeignKey(Note, on_delete=models.CASCADE)
-    section_concept_id = models.IntegerField(null=True, blank=True)
+    note_id = models.ForeignKey(Note, on_delete=DEFAULT_ON_DELETE) # Different from CDM 5.4 Constraints
+    section_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     snippet = models.CharField(max_length=250, null=True, blank=True)
     offset = models.CharField(max_length=50, null=True, blank=True)
     lexical_variant = models.CharField(max_length=250)
-    note_nlp_concept_id = models.IntegerField(null=True, blank=True)
-    note_nlp_source_concept_id = models.IntegerField(null=True, blank=True)
+    note_nlp_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    note_nlp_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     nlp_system = models.CharField(max_length=250, null=True, blank=True)
     nlp_date = models.DateField()
     nlp_datetime = models.DateTimeField(null=True, blank=True)
@@ -520,20 +576,21 @@ class Episode(models.Model):
 			episode_type_concept_id integer NOT NULL,
 			episode_source_value varchar(50) NULL,
 			episode_source_concept_id integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.EPISODE ADD CONSTRAINT xpk_EPISODE PRIMARY KEY (episode_id);
     """
     episode_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    episode_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    episode_concept_id = models.ForeignKey(Concept)
     episode_start_date = models.DateField()
     episode_start_datetime = models.DateTimeField(null=True, blank=True)
     episode_end_date = models.DateField(null=True, blank=True)
     episode_end_datetime = models.DateTimeField(null=True, blank=True)
-    episode_parent_id = models.IntegerField(null=True, blank=True)
+    episode_parent_id = models.ForeignKey('self', on_delete=DEFAULT_ON_DELETE, null=True, blank=True) # Different
     episode_number = models.IntegerField(null=True, blank=True)
-    episode_object_concept_id = models.IntegerField()
-    episode_type_concept_id = models.IntegerField()
+    episode_object_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    episode_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     episode_source_value = models.CharField(max_length=50, null=True, blank=True)
-    episode_source_concept_id = models.IntegerField(null=True, blank=True)
+    episode_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
 
 
 class EpisodeEvent(models.Model):
@@ -543,9 +600,9 @@ class EpisodeEvent(models.Model):
 			event_id integer NOT NULL,
 			episode_event_field_concept_id integer NOT NULL );
     """
-    episode_id = models.IntegerField()
+    episode_id = models.ForeignKey(Episode, on_delete=DEFAULT_ON_DELETE)
     event_id = models.IntegerField()
-    episode_event_field_concept_id = models.IntegerField()
+    episode_event_field_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
 
 class Specimen(models.Model):
     """
@@ -565,17 +622,18 @@ class Specimen(models.Model):
 			unit_source_value varchar(50) NULL,
 			anatomic_site_source_value varchar(50) NULL,
 			disease_status_source_value varchar(50) NULL );
+    ALTER TABLE @cdmDatabaseSchema.SPECIMEN ADD CONSTRAINT xpk_SPECIMEN PRIMARY KEY (specimen_id);
     """
     specimen_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    specimen_concept_id = models.IntegerField()
-    specimen_type_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    specimen_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    specimen_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     specimen_date = models.DateField()
     specimen_datetime = models.DateTimeField(null=True, blank=True)
     quantity = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    unit_concept_id = models.IntegerField(null=True, blank=True)
-    anatomic_site_concept_id = models.IntegerField(null=True, blank=True)
-    disease_status_concept_id = models.IntegerField(null=True, blank=True)
+    unit_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    anatomic_site_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
+    disease_status_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     specimen_source_id = models.CharField(max_length=50, null=True, blank=True)
     specimen_source_value = models.CharField(max_length=50, null=True, blank=True)
     unit_source_value = models.CharField(max_length=50, null=True, blank=True)
@@ -592,8 +650,8 @@ class FactRelationship(models.Model):
 			fact_id_2 integer NOT NULL,
 			relationship_concept_id integer NOT NULL );
     """
-    domain_concept_id_1 = models.IntegerField()
+    domain_concept_id_1 = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     fact_id_1 = models.IntegerField()
-    domain_concept_id_2 = models.IntegerField()
+    domain_concept_id_2 = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     fact_id_2 = models.IntegerField()
-    relationship_concept_id = models.IntegerField()
+    relationship_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)

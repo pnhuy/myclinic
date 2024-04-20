@@ -16,6 +16,7 @@ class Location(models.Model):
 			country_source_value varchar(80) NULL,
 			latitude NUMERIC NULL,
 			longitude NUMERIC NULL );
+    ALTER TABLE @cdmDatabaseSchema.LOCATION ADD CONSTRAINT xpk_LOCATION PRIMARY KEY (location_id);
     """
     location_id = models.IntegerField(primary_key=True)
     address_1 = models.CharField(max_length=50, null=True, blank=True)
@@ -40,6 +41,7 @@ class CareSite(models.Model):
 			location_id integer NULL,
 			care_site_source_value varchar(50) NULL,
 			place_of_service_source_value varchar(50) NULL );
+    ALTER TABLE @cdmDatabaseSchema.CARE_SITE ADD CONSTRAINT xpk_CARE_SITE PRIMARY KEY (care_site_id);
     """
     care_site_id = models.IntegerField(primary_key=True)
     care_site_name = models.CharField(max_length=255, null=True, blank=True)
@@ -65,6 +67,7 @@ class Provider(models.Model):
 			specialty_source_concept_id integer NULL,
 			gender_source_value varchar(50) NULL,
 			gender_source_concept_id integer NULL );
+    ALTER TABLE @cdmDatabaseSchema.PROVIDER ADD CONSTRAINT xpk_PROVIDER PRIMARY KEY (provider_id);
     """
     provider_id = models.IntegerField(primary_key=True)
     provider_name = models.CharField(max_length=255, null=True, blank=True)
