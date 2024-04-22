@@ -1,4 +1,7 @@
 from django.db import models
+from omop.models import DEFAULT_ON_DELETE
+
+from omop.models.vocabularies import Concept
 
 class Metadata(models.Model):
     """
@@ -15,11 +18,11 @@ class Metadata(models.Model):
     ALTER TABLE @cdmDatabaseSchema.METADATA ADD CONSTRAINT xpk_METADATA PRIMARY KEY (metadata_id);
     """
     metadata_id = models.IntegerField(primary_key=True)
-    metadata_concept_id = models.IntegerField()
-    metadata_type_concept_id = models.IntegerField()
+    metadata_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, related_name='metadata_concept_ids')
+    metadata_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, related_name='metadata_type_concept_id')
     name = models.CharField(max_length=250)
     value_as_string = models.CharField(max_length=250, null=True, blank=True)
-    value_as_concept_id = models.IntegerField(null=True, blank=True)
+    value_as_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name='value_as_concept_ids')
     value_as_number = models.DecimalField(max_digits=19, decimal_places=2, null=True, blank=True)
     metadata_date = models.DateField(null=True, blank=True)
     metadata_datetime = models.DateTimeField(null=True, blank=True)
@@ -49,5 +52,5 @@ class CdmSource(models.Model):
     source_release_date = models.DateField()
     cdm_release_date = models.DateField()
     cdm_version = models.CharField(max_length=10, null=True, blank=True)
-    cdm_version_concept_id = models.IntegerField()
+    cdm_version_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     vocabulary_version = models.CharField(max_length=20)

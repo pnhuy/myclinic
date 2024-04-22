@@ -1,5 +1,7 @@
 from django.db import models
+from omop.models import DEFAULT_ON_DELETE
 from omop.models.clinical_data import Person
+from omop.models.vocabularies import Concept
 
 class ConditionEra(models.Model):
     """
@@ -13,8 +15,8 @@ class ConditionEra(models.Model):
     ALTER TABLE @cdmDatabaseSchema.CONDITION_ERA ADD CONSTRAINT xpk_CONDITION_ERA PRIMARY KEY (condition_era_id);
     """
     condition_era_id = models.IntegerField(primary_key=True)
-    person_id = models.IntegerField()
-    condition_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    condition_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     condition_era_start_date = models.DateField()
     condition_era_end_date = models.DateField()
     condition_occurrence_count = models.IntegerField(null=True, blank=True)
@@ -33,8 +35,8 @@ class DrugEra(models.Model):
     ALTER TABLE @cdmDatabaseSchema.DRUG_ERA ADD CONSTRAINT xpk_DRUG_ERA PRIMARY KEY (drug_era_id);
     """
     drug_era_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    drug_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    drug_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
     drug_era_start_date = models.DateField()
     drug_era_end_date = models.DateField()
     drug_exposure_count = models.IntegerField(null=True, blank=True)
@@ -53,9 +55,9 @@ class DoseEra(models.Model):
     ALTER TABLE @cdmDatabaseSchema.DOSE_ERA ADD CONSTRAINT xpk_DOSE_ERA PRIMARY KEY (dose_era_id);
     """
     dose_era_id = models.IntegerField(primary_key=True)
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
-    drug_concept_id = models.IntegerField()
-    unit_concept_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
+    drug_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, related_name="drug_concept_ids")
+    unit_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, related_name="unit_concept_ids")
     dose_value = models.DecimalField(max_digits=10, decimal_places=2)
     dose_era_start_date = models.DateField()
     dose_era_end_date = models.DateField()
@@ -89,8 +91,8 @@ class CohortDefinition(models.Model):
     cohort_definition_id = models.IntegerField()
     cohort_definition_name = models.CharField(max_length=255)
     cohort_definition_description = models.TextField(null=True, blank=True)
-    definition_type_concept_id = models.IntegerField()
+    definition_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, related_name="definition_type_concept_ids")
     cohort_definition_syntax = models.TextField(null=True, blank=True)
-    subject_concept_id = models.IntegerField()
+    subject_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, related_name="subject_concept_ids")
     cohort_initiation_date = models.DateField(null=True, blank=True)
 

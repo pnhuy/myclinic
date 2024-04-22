@@ -1,4 +1,8 @@
 from django.db import models
+from omop.models import DEFAULT_ON_DELETE
+
+from omop.models.clinical_data import Person
+from omop.models.vocabularies import Concept, Domain
 
 
 class Cost(models.Model):
@@ -29,9 +33,9 @@ class Cost(models.Model):
     """
     cost_id = models.IntegerField(primary_key=True)
     cost_event_id = models.IntegerField()
-    cost_domain_id = models.CharField(max_length=20)
-    cost_type_concept_id = models.IntegerField()
-    currency_concept_id = models.IntegerField(null=True, blank=True)
+    cost_domain_id = models.ForeignKey(Domain, max_length=20, on_delete=DEFAULT_ON_DELETE)
+    cost_type_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, related_name="cost_type_concept_ids")
+    currency_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="currency_concept_ids")
     total_charge = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total_paid = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -45,9 +49,9 @@ class Cost(models.Model):
     paid_dispensing_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     payer_plan_period_id = models.IntegerField(null=True, blank=True)
     amount_allowed = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    revenue_code_concept_id = models.IntegerField(null=True, blank=True)
+    revenue_code_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="revenue_code_concept_ids")
     revenue_code_source_value = models.CharField(max_length=50, null=True, blank=True)
-    drg_concept_id = models.IntegerField(null=True, blank=True)
+    drg_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="drg_concept_ids")
     drg_source_value = models.CharField(max_length=3, null=True, blank=True)
 
 class PayerPlanPeriod(models.Model):
@@ -73,20 +77,20 @@ class PayerPlanPeriod(models.Model):
     ALTER TABLE @cdmDatabaseSchema.PAYER_PLAN_PERIOD ADD CONSTRAINT xpk_PAYER_PLAN_PERIOD PRIMARY KEY (payer_plan_period_id);
     """
     payer_plan_period_id = models.IntegerField(primary_key=True)
-    person_id = models.IntegerField()
+    person_id = models.ForeignKey(Person, on_delete=DEFAULT_ON_DELETE)
     payer_plan_period_start_date = models.DateField()
     payer_plan_period_end_date = models.DateField()
-    payer_concept_id = models.IntegerField(null=True, blank=True)
+    payer_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="payer_concept_ids")
     payer_source_value = models.CharField(max_length=50, null=True, blank=True)
-    payer_source_concept_id = models.IntegerField(null=True, blank=True)
-    plan_concept_id = models.IntegerField(null=True, blank=True)
+    payer_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="payer_source_concept_ids")
+    plan_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="plan_concept_ids")
     plan_source_value = models.CharField(max_length=50, null=True, blank=True)
-    plan_source_concept_id = models.IntegerField(null=True, blank=True)
-    sponsor_concept_id = models.IntegerField(null=True, blank=True)
+    plan_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="plan_source_concept_ids")
+    sponsor_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="sponsor_concept_ids")
     sponsor_source_value = models.CharField(max_length=50, null=True, blank=True)
-    sponsor_source_concept_id = models.IntegerField(null=True, blank=True)
+    sponsor_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="sponsor_source_concept_ids")
     family_source_value = models.CharField(max_length=50, null=True, blank=True)
-    stop_reason_concept_id = models.IntegerField(null=True, blank=True)
+    stop_reason_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="stop_reason_concept_ids")
     stop_reason_source_value = models.CharField(max_length=50, null=True, blank=True)
-    stop_reason_source_concept_id = models.IntegerField(null=True, blank=True)
+    stop_reason_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="stop_reason_source_concept_ids")
 

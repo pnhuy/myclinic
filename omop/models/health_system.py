@@ -1,5 +1,8 @@
 from django.db import models
 
+from omop.models import DEFAULT_ON_DELETE
+from omop.models.vocabularies import Concept
+
 
 class Location(models.Model):
     """
@@ -26,7 +29,7 @@ class Location(models.Model):
     zip = models.CharField(max_length=9, null=True, blank=True)
     county = models.CharField(max_length=20, null=True, blank=True)
     location_source_value = models.CharField(max_length=50, null=True, blank=True)
-    country_concept_id = models.IntegerField(null=True, blank=True)
+    country_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     country_source_value = models.CharField(max_length=80, null=True, blank=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
@@ -45,8 +48,8 @@ class CareSite(models.Model):
     """
     care_site_id = models.IntegerField(primary_key=True)
     care_site_name = models.CharField(max_length=255, null=True, blank=True)
-    place_of_service_concept_id = models.IntegerField(null=True, blank=True)
-    location_id = models.IntegerField(null=True, blank=True)
+    place_of_service_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="place_of_service_concept_ids")
+    location_id = models.ForeignKey(Location, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     care_site_source_value = models.CharField(max_length=50, null=True, blank=True)
     place_of_service_source_value = models.CharField(max_length=50, null=True, blank=True)
 
@@ -73,14 +76,13 @@ class Provider(models.Model):
     provider_name = models.CharField(max_length=255, null=True, blank=True)
     npi = models.CharField(max_length=20, null=True, blank=True)
     dea = models.CharField(max_length=20, null=True, blank=True)
-    specialty_concept_id = models.IntegerField(null=True, blank=True)
-    care_site_id = models.IntegerField(null=True, blank=True)
+    specialty_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="specialty_concept_ids")
+    care_site_id = models.ForeignKey(CareSite, on_delete=DEFAULT_ON_DELETE, null=True, blank=True)
     year_of_birth = models.IntegerField(null=True, blank=True)
-    gender_concept_id = models.IntegerField(null=True, blank=True)
+    gender_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="gender_concept_ids")
     provider_source_value = models.CharField(max_length=50, null=True, blank=True)
     specialty_source_value = models.CharField(max_length=50, null=True, blank=True)
-    specialty_source_concept_id = models.IntegerField(null=True, blank=True)
+    specialty_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="specialty_source_concept_ids")
     gender_source_value = models.CharField(max_length=50, null=True, blank=True)
-    gender_source_concept_id = models.IntegerField(null=True, blank=True)
-
+    gender_source_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name="gender_source_concept_ids")
 
