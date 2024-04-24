@@ -44,7 +44,8 @@ class Vocabulary(models.Model):
     vocabulary_name = models.CharField(max_length=255)
     vocabulary_reference = models.CharField(max_length=255, null=True, blank=True)
     vocabulary_version = models.CharField(max_length=255, null=True, blank=True)
-    vocabulary_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    # vocabulary_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    vocabulary_concept_id = models.IntegerField()
 
 
 class Domain(models.Model):
@@ -57,7 +58,9 @@ class Domain(models.Model):
     """
     domain_id = models.CharField(max_length=20, primary_key=True)
     domain_name = models.CharField(max_length=255)
-    domain_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    # domain_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    domain_concept_id = models.IntegerField()
+
 
 class ConceptClass(models.Model):
     """
@@ -69,7 +72,9 @@ class ConceptClass(models.Model):
     """
     concept_class_id = models.CharField(max_length=20, primary_key=True)
     concept_class_name = models.CharField(max_length=255)
-    concept_class_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    # concept_class_concept_id = models.ForeignKey(Concept, on_delete=DEFAULT_ON_DELETE)
+    concept_class_concept_id = models.IntegerField()
+
 
 class ConceptRelationship(models.Model):
     """
