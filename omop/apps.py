@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class OmopConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'omop'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "omop"

@@ -1,0 +1,10 @@
+[project]
+name = "myclinic"
+version = "0.0.1"
+requires-python = ">=3.11"
+authors = [
+  {name = "Huy Pham", email = "keixi512@gmail.com"},
+]
+
+[tool.ruff]
+line-length = 99
