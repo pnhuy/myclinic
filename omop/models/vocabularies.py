@@ -286,16 +286,16 @@ class DrugStrength(models.Model):
     # ingredient_concept_id = models.ForeignKey(Concept,
     # on_delete=DEFAULT_ON_DELETE, related_name='ingredient_concept_ids')
     ingredient_concept_id = models.IntegerField()
-    amount_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    amount_value = models.DecimalField(max_digits=25, decimal_places=10, null=True, blank=True)
     # amount_unit_concept_id = models.ForeignKey(Concept,
     # on_delete=DEFAULT_ON_DELETE, null=True, blank=True, related_name='amount_unit_concept_ids')
     amount_unit_concept_id = models.IntegerField(null=True, blank=True)
-    numerator_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    numerator_value = models.DecimalField(max_digits=25, decimal_places=10, null=True, blank=True)
     # numerator_unit_concept_id = models.ForeignKey(Concept,
     # on_delete=DEFAULT_ON_DELETE, null=True, blank=True,
     # related_name='numerator_unit_concept_ids')
     numerator_unit_concept_id = models.IntegerField(null=True)
-    denominator_value = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    denominator_value = models.DecimalField(max_digits=25, decimal_places=10, null=True)
     # denominator_unit_concept_id = models.ForeignKey(Concept,
     # on_delete=DEFAULT_ON_DELETE, null=True, blank=True,
     # related_name='denominator_unit_concept_ids')
